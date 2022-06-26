@@ -1,97 +1,111 @@
 <script>
-   import { createEventDispatcher } from 'svelte';
-   let dispacher = createEventDispatcher();
-   const getRandomInt = () =>{
-  return Math.floor(Math.random() * 50);
-}
+	import { createEventDispatcher } from 'svelte';
+  import {developers} from './stores/dev_store'
+  const display = createEventDispatcher();
+ let developer = {
+  f_name: "",
+  l_name: "",
+  age: 0,
+  skills: [],
+  experience:""
+ }
+export let show = false;
+ let options = ["HTML", "CSS", "Javascript"]
+ const  handleSubmit = ()=>{
+  //console.log('develo = ', developer)
+  developers.addDev(developer)
+  developer = {
+  f_name: "",
+  l_name: "",
+  age: 0,
+  skills: [],
+  experience:""
+ }
+  show = false
+  display("close")
+ }
 
-   export let show = false
-   let id_provider = 0
-   let id = 0
-   let firstName =""
-   let lastName = ""
-   let age = 0
-   let skills = [] // to store his skills ex: ReactJs JavaScript
-   let experience = ""
-   let options = ["junior", "senior"] 
-   const handleSubmit = ()=>{
-     let developer = {
-      id: getRandomInt(),
-      firstName,
-      lastName,
-      age,
-      skills,
-      experience
-     }
-     
-     dispacher("dev_info", developer)
-     show=false
-     dispacher("show", show)
-     firstName = ""
-     lastName = ""
-     age = 0
-     experience = ""
-     skills = []
-   }
-   const handleShow = ()=>{
-      show = !show
-      dispacher("show", show)
-   }
 </script>
 
-<div on:click|self={handleShow} class={show ? "container" : "hide"}>
-   <div class="form_container">
-    <form on:submit|preventDefault={handleSubmit}>
-      <input type="text" placeholder="First Name "bind:value={firstName} />
-      <input type="text" placeholder="Last Name "bind:value={lastName} />
-      <input type="number" placeholder="age" bind:value={age} />
-      <div  class="form_check">
-         <input type="checkbox" name="html" bind:group={skills} value="HTML"/>
-         <label for="html">HTML</label>
+<main>
+ <div 
+ on:click|self={()=>{
+   show = false
+  display("close")
+ }}
+ class={show ?"container":"hide" }>
+ 
+  
+  <form on:submit|preventDefault={handleSubmit}>
+    <h1>
+      <slot name="title">
+        unknown title
+      </slot>
+    </h1>
+     <div class="input_container">
+      <label for="f_name">First Name : </label>
+      <input type="text" bind:value={developer.f_name} id="f_name" placeholder="First Name" />
+     </div>
+     <div class="input_container">
+      <label for="l_name">Last Name : </label>
+      <input type="text" bind:value={developer.l_name}  id="l_name" placeholder="Last Name" />
+     </div> 
+     <div class="input_container">
+      <label for="age">Age : </label>
+      <input type="number" bind:value={developer.age} id="age" placeholder="Age" />
+     </div>
+     <div class="skills_container">
+      Your skills : 
+     
+     {#each options as op}
+      <div class="input_container">
+        <label for={op}>{op}</label>
+        <input type="checkbox" bind:group={developer.skills} value={op}/>
       </div>
-      <div class="form_check">
-         <input type="checkbox" name="css" bind:group={skills} value="CSS"/>
-         <label for="css">CSS</label>
+     {/each}
+    </div>
+      <div class="input_container">
+        <label for="exp">Experience</label>
+        <select id="exp" bind:value={developer.experience}>
+          <option value={"Junior"}>Junior</option>
+          <option value={"Sinior"}>Sinior</option>
+        </select>
       </div>
-      <div class="form_check">
-         <input type="checkbox" name="js" bind:group={skills} value="JavaScript"/>
-         <label for="js">JavaScript</label>
-      </div>   
-      <select bind:value={experience}>
-         <option value={options[0]}> {options[0]}</option>
-         <option value={options[1]}> {options[1]}</option>
-      </select>
-      <button>Submit</button>
-    </form>
-   </div>
-</div>
+      <button>
+        Add Developer
+      </button>
+  </form>
+ </div>
+</main>
 
 <style>
- .container{
-   position: fixed;
-   display: flex;
-   justify-content: center;
-   align-items:center;
-   width: 100%;
-   height: 100vh;
-   background-color: rgba(0, 0, 0, 0.713);
- }
- .form_container{
-   min-width: 300px;
-   padding: 10px;
-   min-height:30vh;
-   background-color: rgb(252, 248, 248);
- }
- .form_container form {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
- }
- .form_check{
-   display: flex;
-   align-items: center;
- }
- .hide {
-   display: none;
- }
+  .hide {
+    display: none;
+  }
+  .container {
+    position: fixed;
+    top:0px;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.515);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  form {
+    width: 30%;
+    height: 50vh;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+  }
+  .skills_container{
+    display: flex;
+    margin: 20px auto;
+  }
+  button {
+    margin: 10px;
+  }
 </style>

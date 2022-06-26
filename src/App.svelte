@@ -1,74 +1,65 @@
 <script>
-import { element } from "svelte/internal";
-import Developer from "./Developer.svelte";
-let developer = {
-    id: 0,
-    firstName : "",
-    lastName : "",
-    age : 0,
-    skills : [],
-    experience : ""
-}
-let list = []
-let show = false
+import Developer from './Developer.svelte'
+import {developers} from './stores/dev_store'
+let show = false;
 const handleShow = ()=>{
     show = !show
 }
-const handleNotify = (e)=>{
-    developer = {...e.detail}
-    list = [developer, ...list]
-
+const handleClose = ()=>{
+    show = false;
 }
-const handleShowFromChild = (e)=>{
-   show = e.detail
+const handleDelete = (name)=>{
+    developers.deleteDev(name)
 }
-const handleDelete = (id)=>{
-    list = list.filter(l => l.id !== id)
+const handleReset = ()=>{
+    developers.rest()
 }
 </script>
 
-<main >
-<button on:click={handleShow}>
-    Add a developper 
-</button>
-<Developer 
-on:show={handleShowFromChild}
-on:dev_info={handleNotify} {show}/>
+<main>
 
-{#each list as element (element.id)}
+<button on:click={handleShow}>
+    Add Developer
+</button>
+<button on:click={handleReset}>
+    Reset List of developers
+</button>
+{#each $developers as dev}
 <div class="dev_container">
     <div>
-        First name: {element.firstName}
-        Last name : {element.lastName} 
-        age       : {element.age} <br/>
-        skills    : {element.skills} <br/>
-        experience: {element.experience} <br/>
+        First Name : {dev.f_name}
     </div>
-   <button on:click={()=>handleDelete(element.id)}>Delete Developer</button>
+    <div>
+        Last Name : {dev.l_name}
+    </div>
+    <div>
+        age : {dev.age}
+    </div>
+    <div>
+        Skills : {dev.skills}
+    </div>
+    <div>
+        Experience : {dev.experience}
+    </div>
+    <button on:click={()=>handleDelete(dev.f_name)}>Delete dev</button>
 </div>
 {:else}
-<p>No developer info available</p>
+<p>
+    No element in the list 
+</p>
 {/each}
+<Developer {show} on:close={handleClose}>
+    <span slot="title">
+        Add developer form
+    </span>
+</Developer>
 </main>
 
 <style>
-main{
-    display: flex;
-    flex-direction: column;
-    padding-top: 50px;
-    width: 100wv;
-    height: 100vh;
-    background-color: rgb(243, 243, 243);
-    align-items: center;
-    gap: 30px;
-}
-button{
-    width: 200px;
-    height: 50px;
-  
-}
-.dev_container div{
+.dev_container{
     border: 1px solid black;
-    padding: 5px;
+    width: 50%;
+    padding: 10px;
+    margin: 10px auto;
 }
 </style>
